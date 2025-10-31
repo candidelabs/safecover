@@ -1,5 +1,6 @@
 import {
   arbitrum,
+  avalanche,
   base,
   mainnet,
   optimism,
@@ -19,6 +20,8 @@ function getEtherscanBaseUrl(chainId: number): string {
       return "https://basescan.org";
     case arbitrum.id:
       return "https://arbiscan.io";
+    case avalanche.id:
+      return "https://snowscan.xyz";
     case polygon.id:
       return "https://polygonscan.com";
     default:

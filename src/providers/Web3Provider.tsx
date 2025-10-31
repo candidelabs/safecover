@@ -4,6 +4,7 @@ import { WagmiProvider, createConfig, http, injected } from "wagmi";
 import { walletConnect } from "wagmi/connectors";
 import {
   arbitrum,
+  avalanche,
   base,
   mainnet,
   optimism,
@@ -19,13 +20,14 @@ const walletConnectProjectId = "02b6cf06bc1d1b779db60f301acca581";
 const config = createConfig(
   getDefaultConfig({
     // Your dApps chains
-    chains: [mainnet, optimism, arbitrum, base, polygon, sepolia],
+    chains: [mainnet, optimism, arbitrum, avalanche, base, polygon, sepolia],
     transports: {
       [mainnet.id]: http(process.env.NEXT_PUBLIC_MAINNET_RPC_URL ?? ""),
       [optimism.id]: http(process.env.NEXT_PUBLIC_OPTIMISM_RPC_URL ?? ""),
       [arbitrum.id]: http(process.env.NEXT_PUBLIC_ARBITRUM_RPC_URL ?? ""),
       [base.id]: http(process.env.NEXT_PUBLIC_BASE_RPC_URL ?? ""),
       [polygon.id]: http(process.env.NEXT_PUBLIC_POLYGON_RPC_URL ?? ""),
+      [avalanche.id]: http(process.env.NEXT_PUBLIC_AVALANCHE_RPC_URL ?? ""),
       [sepolia.id]: process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL
         ? http(process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL)
         : http("https://sepolia.gateway.tenderly.co"),
