@@ -249,7 +249,7 @@ function WalletNotConnected() {
   return (
     <div className="max-w-2xl text-center">
       <h2 className="text-2xl text-primary font-bold font-roboto-mono text-center ">
-        Connect the Account you want to protect.{" "}
+        Connect the Safe Account you want to protect.{" "}
       </h2>
       <p className="text-lg font-roboto-mono text-center text-foreground mb-6 mt-4">
         The recovery module helps you regain control of your account if your key
