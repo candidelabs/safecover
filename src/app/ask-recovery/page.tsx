@@ -55,16 +55,15 @@ export default function AskRecovery() {
     Number(chainId)
   );
 
-  // Automatically set default chain if user connects on wallet
+  // Automatically set app chain to match wallet's connected chain
   useEffect(() => {
     if (
       accountChainId &&
-      chains.map((chain) => chain.id).includes(accountChainId) &&
-      currentStep == 1
+      chains.map((chain) => chain.id).includes(accountChainId)
     ) {
       setChainId(accountChainId.toString());
     }
-  }, [accountChainId, chains, setChainId, currentStep]);
+  }, [accountChainId, chains]);
 
   const isNextDisabled =
     (currentStep === 1 && !safeAddress) ||
