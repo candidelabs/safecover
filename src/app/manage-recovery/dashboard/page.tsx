@@ -21,7 +21,7 @@ import { createFinalUrl } from "@/utils/recovery-link";
 import { useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { Address } from "viem";
-import { useAccount, useSwitchChain } from "wagmi";
+import { useAccount } from "wagmi";
 import { sepolia } from "wagmi/chains";
 
 const tabState = cn(
@@ -47,8 +47,6 @@ export default function Dashboard() {
   useEffect(() => {
     if (chainIdFromWallet === sepolia.id) setDelayPeriod(1);
   }, [chainIdFromWallet]);
-  const { switchChain } = useSwitchChain();
-
   const recoveryLinkFromWallet =
     address &&
     recoveryInfo &&
@@ -78,7 +76,8 @@ export default function Dashboard() {
   const safeAddress = safeAddressFromParams ?? safeAddressFromWallet ?? address;
   const newOwners = newOwnersFromParams ?? newOwnersFromWallet;
   const newThreshold = newThresholdFromParams ?? newThresholdFromWallet;
-  const chainId = chainIdFromParams ?? chainIdFromWallet;
+  // Match app network to wallet network when wallet is connected
+  const chainId = chainIdFromWallet ?? chainIdFromParams;
 
   const { owners: safeSigners, safeThreshold } = useSrmData(
     safeAddress,
@@ -99,22 +98,6 @@ export default function Dashboard() {
 
   const shouldRedirectToSettings = !recoveryLink && address;
   const shouldCallReconnect = !recoveryLink && !address && !isConnecting;
-
-  // Atomatically switches to link chain
-  useEffect(() => {
-    if (
-      recoveryLinkFromParams &&
-      chainIdFromParams &&
-      chainIdFromWallet &&
-      chainIdFromWallet !== chainIdFromParams
-    )
-      switchChain({ chainId: chainIdFromParams });
-  }, [
-    switchChain,
-    recoveryLinkFromParams,
-    chainIdFromParams,
-    chainIdFromWallet,
-  ]);
 
   const queryClient = useQueryClient();
 
