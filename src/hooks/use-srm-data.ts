@@ -52,8 +52,10 @@ export function useSrmData(safeAddress?: Address, chainId?: number) {
 
         const output = {} as SrmData;
 
-        if (results[0].status === "success")
-          output.owners = results[0].result as Address[];
+        output.owners =
+          results[0].status === "success"
+            ? (results[0].result as Address[])
+            : [];
         if (results[1].status === "success")
           output.safeThreshold = Number(results[1].result);
         output.guardians = [];
@@ -95,12 +97,16 @@ export function useSrmData(safeAddress?: Address, chainId?: number) {
 
       const output = {} as SrmData;
 
-      if (results[0].status === "success")
-        output.owners = results[0].result as Address[];
+      output.owners =
+        results[0].status === "success"
+          ? (results[0].result as Address[])
+          : [];
       if (results[1].status === "success")
         output.safeThreshold = Number(results[1].result);
-      if (results[2].status === "success")
-        output.guardians = results[2].result as Address[];
+      output.guardians =
+        results[2].status === "success"
+          ? (results[2].result as Address[])
+          : [];
       if (results[3].status === "success")
         output.threshold = Number(results[3].result);
       if (results[4].status === "success")

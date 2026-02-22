@@ -22,13 +22,13 @@ export function useValidateNewGuardian() {
 
       // 3. Can't be an owner
       if (owners === undefined)
-        throw new Error("[validateNewGuardian] missing owners");
+        return { isValid: false, reason: "Loading account data. Please try again." };
       if (owners.includes(newGuardian))
         return { isValid: false, reason: "Owners can't be guardians." };
 
       // 4. Can't be a guardian
       if (guardians === undefined)
-        throw new Error("[validateNewGuardian] missing guardians");
+        return { isValid: false, reason: "Loading account data. Please try again." };
       if (guardians.includes(newGuardian))
         return {
           isValid: false,
