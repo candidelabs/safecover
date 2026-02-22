@@ -24,7 +24,7 @@ export function GuardianRow({
         {guardian.nickname}
       </div>
       <div className="flex items-center gap-2">
-        <code className="text-xs text-foreground opacity-6g0 font-medium font-roboto-mono">
+        <code className="text-xs text-foreground opacity-60 font-medium font-roboto-mono">
           {guardian.address}
         </code>
         <Link

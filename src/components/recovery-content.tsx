@@ -257,7 +257,7 @@ export default function RecoveryContent({
             </div>
             <span className="text-xs flex justify-end text-[10px] opacity-60">
               {delayPeriodEnded
-                ? "Anyone can finalize the reocvery request."
+                ? "Anyone can finalize the recovery request."
                 : "Only pending Guardians can approve this recovery request."}
             </span>
             <Modal
