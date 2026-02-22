@@ -1,4 +1,4 @@
-import { NewAddress } from "../guardian-list";
+import { NewAddress } from "@/types";
 import NewAddressList from "../new-address-list";
 
 interface NewOwnersProps {

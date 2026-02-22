@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { NewAddress, GuardianList } from "./guardian-list";
+import { GuardianList } from "./guardian-list";
+import { NewAddress } from "@/types";
 import { Modal } from "./modal";
 import { Button } from "./ui/button";
 import GuardiansStep from "./protect-account-steps/guardians";

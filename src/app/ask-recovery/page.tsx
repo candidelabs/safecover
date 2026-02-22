@@ -1,6 +1,6 @@
 "use client";
 
-import { NewAddress } from "@/components/guardian-list";
+import { NewAddress } from "@/types";
 import SafeAddress from "@/components/ask-recovery-steps/safe-address";
 import NewOwners from "@/components/ask-recovery-steps/new-owners";
 import NewThreshold from "@/components/ask-recovery-steps/new-threshold";

@@ -1,7 +1,6 @@
 "use client";
 
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
-import { Address } from "viem";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "./use-toast";
 import { getReadableError } from "@/utils/get-readable-error";
@@ -9,12 +8,7 @@ import { useIsSafeAccount } from "./use-is-safe-account";
 import { useWaitNextSafeAccountTx } from "./use-wait-next-safe-account-tx";
 import { useState } from "react";
 import { eip5792Actions } from "viem/experimental";
-
-interface BaseTx {
-  to: Address;
-  value: bigint;
-  data: `0x${string}`;
-}
+import { BaseTx } from "@/types";
 
 export function useExecuteTransaction({
   buildTxFn,

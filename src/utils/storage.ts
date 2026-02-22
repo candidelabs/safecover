@@ -1,7 +1,7 @@
 "use client";
 
 import { Address } from "viem";
-import { NewAddress } from "@/components/guardian-list";
+import { NewAddress } from "@/types";
 
 // Constants
 const STORAGE_KEY = "candide-address-recovery:v1" as const;

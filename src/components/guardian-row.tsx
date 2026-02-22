@@ -1,5 +1,5 @@
 import { ExternalLink, Minus } from "lucide-react";
-import { NewAddress } from "./guardian-list";
+import { NewAddress } from "@/types";
 import PressableIcon from "./pressable-icon";
 import { Button } from "./ui/button";
 import Link from "next/link";

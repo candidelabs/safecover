@@ -4,16 +4,14 @@ import { Button } from "./ui/button";
 import { Modal } from "./modal";
 import ThresholdStep from "./protect-account-steps/threshold";
 import DelayPeriodStep from "./protect-account-steps/delay-period";
-import { NewAddress } from "./guardian-list";
+import { NewAddress } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useUpdateParameters } from "@/hooks/use-update-parameters";
 import LoadingModal from "./loading-modal";
 import { useSrmData } from "@/hooks/use-srm-data";
-import {
-  SrmAddress,
-  useSocialRecoveryModule,
-} from "@/hooks/use-social-recovery-module";
+import { useSocialRecoveryModule } from "@/hooks/use-social-recovery-module";
+import { SrmAddress } from "@/types";
 import { SocialRecoveryModuleGracePeriodSelector } from "abstractionkit";
 
 export const delayPeriodMap: Record<SrmAddress, number> = {

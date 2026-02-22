@@ -1,56 +1,12 @@
 "use client";
 
-import {
-  SrmAddress,
-  useSocialRecoveryModule,
-} from "./use-social-recovery-module";
+import { useSocialRecoveryModule } from "./use-social-recovery-module";
 import { useCallback } from "react";
 import { useAccount, useWalletClient, usePublicClient } from "wagmi";
-import { Address, PublicClient } from "viem";
-import { getIsModuleEnabled } from "@/utils/getIsModuleEnabled";
 import { useExecuteTransaction } from "./use-execute-transaction";
-import { SocialRecoveryModule } from "abstractionkit";
 import { useSrmData } from "./use-srm-data";
-
-export async function buildAddGuardiansTxs(
-  srm: SocialRecoveryModule,
-  publicClient: PublicClient,
-  signer: Address,
-  guardians: Address[],
-  currentGuardiansCount: number,
-  threshold: number
-) {
-  const txs = [];
-
-  const isModuleEnabled = await getIsModuleEnabled(
-    publicClient,
-    signer,
-    srm.moduleAddress as Address
-  );
-
-  if (!isModuleEnabled) {
-    const enableModuleTx = srm.createEnableModuleMetaTransaction(signer);
-    txs.push(enableModuleTx);
-  }
-
-  for (const [idx, guardian] of guardians.entries()) {
-    const addGuardianTx = srm.createAddGuardianWithThresholdMetaTransaction(
-      guardian,
-      BigInt(
-        currentGuardiansCount + idx + 1 > threshold
-          ? threshold
-          : currentGuardiansCount + idx + 1
-      )
-    );
-    txs.push(addGuardianTx);
-  }
-
-  return txs.map((tx) => ({
-    to: tx.to as Address,
-    data: tx.data as `0x${string}`,
-    value: tx.value,
-  }));
-}
+import { buildAddGuardiansTxs } from "@/utils/transaction-builders";
+import { SrmAddress } from "@/types";
 
 export function useAddGuardians({
   guardians,
@@ -59,7 +15,7 @@ export function useAddGuardians({
   onSuccess,
   onError,
 }: {
-  guardians: Address[] | undefined;
+  guardians: `0x${string}`[] | undefined;
   threshold: number | undefined;
   srmAddress?: SrmAddress;
   onSuccess?: () => void;
@@ -84,7 +40,7 @@ export function useAddGuardians({
       throw new Error("Missing params");
     }
 
-    const txs = await buildAddGuardiansTxs(
+    return buildAddGuardiansTxs(
       srm,
       publicClient,
       signer,
@@ -92,8 +48,6 @@ export function useAddGuardians({
       currentGuardians.length,
       threshold
     );
-
-    return txs;
   }, [
     signer,
     publicClient,

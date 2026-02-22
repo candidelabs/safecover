@@ -1,5 +1,5 @@
 import { STYLES } from "@/constants/styles";
-import { NewAddress } from "../guardian-list";
+import { NewAddress } from "@/types";
 import AddressSection from "@/components/address-section";
 
 interface NewOwnersProps {

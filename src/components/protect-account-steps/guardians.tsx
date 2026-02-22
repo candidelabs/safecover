@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
 import NewAddressList from "../new-address-list";
-import { NewAddress } from "../guardian-list";
+import { NewAddress } from "@/types";
 import { useValidateNewGuardian } from "@/hooks/use-validate-new-guardian";
 import { useCallback } from "react";
 

@@ -6,13 +6,7 @@ import { Address } from "viem";
 import { useQuery } from "@tanstack/react-query";
 import { safeWalletAbi } from "@/utils/abis/safeWalletAbi";
 import { socialRecoveryModuleAbi } from "@/utils/abis/socialRecoveryModuleAbi";
-
-export interface RecoveryInfo {
-  guardiansApprovalCount: number;
-  newThreshold: number;
-  executeAfter: number;
-  newOwners: readonly Address[];
-}
+import { RecoveryInfo } from "@/types";
 
 export interface SrmData {
   owners?: Address[];

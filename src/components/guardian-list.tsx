@@ -15,11 +15,7 @@ import { toast } from "@/hooks/use-toast";
 import { useAccount } from "wagmi";
 import { getEtherscanAddressLink } from "@/utils/get-etherscan-link";
 
-export interface NewAddress {
-  nickname: string;
-  address: string;
-  status?: string;
-}
+import { NewAddress } from "@/types";
 
 interface GuardianListProps {
   guardians: NewAddress[];

@@ -7,12 +7,7 @@ import { useAccount, usePublicClient } from "wagmi";
 import { sepolia } from "wagmi/chains";
 import { useQuery } from "@tanstack/react-query";
 import { socialRecoveryModuleAbi } from "@/utils/abis/socialRecoveryModuleAbi";
-
-export type SrmAddress =
-  | SocialRecoveryModuleGracePeriodSelector.After3Minutes
-  | SocialRecoveryModuleGracePeriodSelector.After3Days
-  | SocialRecoveryModuleGracePeriodSelector.After7Days
-  | SocialRecoveryModuleGracePeriodSelector.After14Days;
+import { SrmAddress } from "@/types";
 
 const srmAddresses: SrmAddress[] = [
   SocialRecoveryModuleGracePeriodSelector.After3Minutes,

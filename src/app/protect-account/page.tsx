@@ -12,7 +12,7 @@ import { useAddGuardians } from "@/hooks/use-add-guardians";
 import { Address } from "viem";
 import { storeGuardians } from "@/utils/storage";
 import { useToast } from "@/hooks/use-toast";
-import { NewAddress } from "@/components/guardian-list";
+import { NewAddress } from "@/types";
 import LoadingModal from "@/components/loading-modal";
 import { sepolia } from "wagmi/chains";
 import { BaseForm } from "@/components/base-form";

@@ -1,4 +1,4 @@
-import { SrmAddress } from "@/hooks/use-social-recovery-module";
+import { SrmAddress } from "@/types";
 import { SocialRecoveryModuleGracePeriodSelector } from "abstractionkit";
 
 export const delayPeriodMap: Record<string, SrmAddress> = {

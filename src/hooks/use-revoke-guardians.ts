@@ -1,40 +1,11 @@
 "use client";
 
 import { useSocialRecoveryModule } from "./use-social-recovery-module";
-import { Address, encodeFunctionData, zeroAddress } from "viem";
+import { Address, zeroAddress } from "viem";
 import { useExecuteTransaction } from "./use-execute-transaction";
 import { useCallback } from "react";
-import { SocialRecoveryModule } from "abstractionkit";
-import { socialRecoveryModuleAbi } from "@/utils/abis/socialRecoveryModuleAbi";
 import { useSrmData } from "./use-srm-data";
-
-async function buildRevokeGuardiansTxs(
-  srm: SocialRecoveryModule,
-  prevGuardian: Address,
-  guardians: Address[],
-  threshold: number
-) {
-  const txs = [];
-
-  for (const guardian of guardians) {
-    const revokeGuardianTx = {
-      to: srm.moduleAddress,
-      data: encodeFunctionData({
-        abi: socialRecoveryModuleAbi,
-        functionName: "revokeGuardianWithThreshold",
-        args: [prevGuardian, guardian, BigInt(threshold)],
-      }),
-      value: BigInt(0),
-    };
-    txs.push(revokeGuardianTx);
-  }
-
-  return txs.map((tx) => ({
-    to: tx.to as Address,
-    data: tx.data as `0x${string}`,
-    value: tx.value,
-  }));
-}
+import { buildRevokeGuardiansTxs } from "@/utils/transaction-builders";
 
 export function useRevokeGuardians({
   guardians,
@@ -58,13 +29,7 @@ export function useRevokeGuardians({
 
     const prevGuardian = `${zeroAddress.slice(0, -1)}1` as Address;
 
-    const txs = await buildRevokeGuardiansTxs(
-      srm,
-      prevGuardian,
-      guardians,
-      threshold
-    );
-    return txs;
+    return buildRevokeGuardiansTxs(srm, prevGuardian, guardians, threshold);
   }, [guardians, threshold, srm, currentGuardians]);
 
   return useExecuteTransaction({

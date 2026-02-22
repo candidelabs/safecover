@@ -6,15 +6,8 @@ import { Address } from "viem";
 import { useQuery } from "@tanstack/react-query";
 import { getGuardianNickname, getStoredGuardians } from "@/utils/storage";
 import { useSrmData } from "./use-srm-data";
-import { NewAddress } from "@/components/guardian-list";
 import { socialRecoveryModuleAbi } from "@/utils/abis/socialRecoveryModuleAbi";
-
-export interface ApprovalsInfo {
-  guardiansApprovals: NewAddress[];
-  totalGuardianApprovals: number;
-  guardiansThreshold: number | undefined;
-  pendingGuardians: Address[];
-}
+import { ApprovalsInfo } from "@/types";
 
 export function useApprovalsInfo({
   safeAddress,

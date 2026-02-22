@@ -4,7 +4,7 @@ import { STYLES } from "@/constants/styles";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { ExternalLink, X } from "lucide-react";
-import { NewAddress } from "./guardian-list";
+import { NewAddress } from "@/types";
 import { isAddress } from "viem";
 
 interface NewAddressListProps {
