@@ -114,7 +114,7 @@ export function useSrmData(safeAddress?: Address, chainId?: number) {
           guardiansApprovalCount: Number(
             results[4].result.guardiansApprovalCount
           ),
-          newThreshold: Number(results[4].result.guardiansApprovalCount),
+          newThreshold: Number(results[4].result.newThreshold),
           executeAfter: Number(results[4].result.executeAfter),
           newOwners: results[4].result.newOwners,
         } as RecoveryInfo;
