@@ -4,6 +4,7 @@ import { NewAddress } from "@/types";
 import { Modal } from "./modal";
 import { Button } from "./ui/button";
 import GuardiansStep from "./protect-account-steps/guardians";
+import { useModalSteps } from "@/hooks/use-modal-steps";
 import ThresholdStep from "./protect-account-steps/threshold";
 import ReviewStepSection from "./protect-account-steps/review";
 import { useToast } from "@/hooks/use-toast";
@@ -22,7 +23,6 @@ import Link from "next/link";
 import { getEtherscanAddressLink } from "@/utils/get-etherscan-link";
 
 const buttonStyles = "rounded-xl font-roboto-mono h-7 font-bold text-xs";
-const totalSteps = 3;
 
 interface GuardiansContentProps {
   threshold: number;
@@ -41,7 +41,6 @@ export default function GuardiansContent({
 }: GuardiansContentProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [guardians, setGuardians] = useState<NewAddress[]>([]);
-  const [currentStep, setCurrentStep] = useState(1);
 
   const {
     guardians: guardiansWithoutNicknames,
@@ -111,20 +110,12 @@ export default function GuardiansContent({
     }
   };
 
-  const handleNext = () => {
-    if (!currentGuardians) return;
-    if (currentStep < totalSteps) {
-      setCurrentStep((prev) => prev + 1);
-    } else {
-      addGuardians();
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep((prev) => prev - 1);
-    }
-  };
+  const { currentStep, totalSteps, handleNext, handleBack } = useModalSteps({
+    totalSteps: 3,
+    onFinalStep: () => {
+      if (currentGuardians) addGuardians();
+    },
+  });
 
   const handleThresholdChange = (value: number) => {
     onThresholdChange(value);
@@ -159,7 +150,7 @@ export default function GuardiansContent({
           <div className="space-y-5">
             <>
               <span className="text-lg font-bold font-roboto-mono opacity-60">
-                New NewAddress
+                New Guardians
               </span>
               <div className="mt-3">
                 <GuardiansStep

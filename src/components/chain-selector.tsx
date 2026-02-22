@@ -24,12 +24,10 @@ export const ChainSelector = ({
 
   useEffect(() => {
     if (linkChainId) {
-      console.log("a", linkChainId);
       setChainId(String(linkChainId));
       return;
     }
     if (connectedChainId) {
-      console.log("b", connectedChainId);
       setChainId(String(connectedChainId));
     }
   }, [linkChainId, connectedChainId, setChainId]);

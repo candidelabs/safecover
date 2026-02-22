@@ -14,6 +14,7 @@ import LoadingModal from "./loading-modal";
 import { toast } from "@/hooks/use-toast";
 import { useAccount } from "wagmi";
 import { getEtherscanAddressLink } from "@/utils/get-etherscan-link";
+import { useModalSteps } from "@/hooks/use-modal-steps";
 
 import { NewAddress } from "@/types";
 
@@ -26,8 +27,6 @@ interface GuardianListProps {
   linkChainId?: number;
 }
 
-const totalSteps = 3;
-
 export function GuardianList({
   guardians,
   isNewGuardianList,
@@ -39,11 +38,23 @@ export function GuardianList({
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
   const [isLastGuardianModalOpen, setIsLastGuardianModalOpen] = useState(false);
   const [guardianToRemove, setGuardianToRemove] = useState<NewAddress>();
-  const [currentStep, setCurrentStep] = useState(1);
   const [threshold, setThreshold] = useState(1);
 
   const { chainId: connectedChainId } = useAccount();
   const chainId = linkChainId ?? connectedChainId;
+
+  const handleConfirmRemove = () => {
+    if (guardianToRemove && onRemoveGuardian) {
+      onRemoveGuardian(guardianToRemove);
+    }
+    revokeGuardians();
+  };
+
+  const { currentStep, totalSteps, handleNext, handleBack, reset } =
+    useModalSteps({
+      totalSteps: 3,
+      onFinalStep: handleConfirmRemove,
+    });
 
   const {
     trigger: revokeGuardians,
@@ -61,27 +72,13 @@ export function GuardianList({
       setIsRemoveModalOpen(false);
       setIsLastGuardianModalOpen(false);
       setGuardianToRemove({ nickname: "", address: "" });
-      setCurrentStep(1);
+      reset();
       resetQueries();
     },
   });
 
-  const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep((prev) => prev + 1);
-    } else {
-      handleConfirmRemove();
-    }
-  };
-
   const handleThresholdChange = (value: number) => {
     setThreshold(value);
-  };
-
-  const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep((prev) => prev - 1);
-    }
   };
 
   const handleRemoveClick = (guardian: NewAddress) => {
@@ -91,13 +88,6 @@ export function GuardianList({
       return;
     }
     setIsRemoveModalOpen(true);
-  };
-
-  const handleConfirmRemove = () => {
-    if (guardianToRemove && onRemoveGuardian) {
-      onRemoveGuardian(guardianToRemove);
-    }
-    revokeGuardians();
   };
 
   const handleExternalLink = (address: string): void => {

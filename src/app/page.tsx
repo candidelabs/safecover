@@ -23,13 +23,13 @@ export default function Home() {
               title="PROTECT MY ACCOUNT"
               description="Activate Safe Account Recovery to protect your account."
               href="/protect-account"
-              onClick={() => console.log("Protect account")}
+
             />
             <HomeButton
               label="ANYONE"
               title="RECOVER AN ACCOUNT"
               description="Ask for recovery if you lost access to your account."
-              onClick={() => console.log("Protect account")}
+
               href="/ask-recovery"
             />
             <HomeButton
@@ -37,13 +37,13 @@ export default function Home() {
               title="MANAGE RECOVERY"
               description="Approve ongoing requests and manage guardians permissions."
               href="/manage-recovery/dashboard"
-              onClick={() => console.log("Protect account")}
+
             />
             <HomeButton
               label="OWNERS AND GUARDIANS"
               title="CANCEL RECOVERY"
               description="Cancel a request if there's no need to recover the account."
-              onClick={() => console.log("Protect account")}
+
               href="/manage-recovery"
             />
           </div>

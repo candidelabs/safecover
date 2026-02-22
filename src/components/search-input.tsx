@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Search, Loader2 } from "lucide-react";
 import { Input } from "./ui/input";
@@ -11,10 +11,6 @@ const SearchInput = () => {
   const [chainId, setChainId] = useState<string>("1");
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
-
-  useEffect(() => {
-    console.log({ chainId });
-  }, [chainId]);
 
   const { isLoading, searchValue, setSearchValue, handleSearch } =
     useSearchStore({ chainId: Number(chainId) });

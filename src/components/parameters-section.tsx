@@ -4,14 +4,14 @@ import { Button } from "./ui/button";
 import { Modal } from "./modal";
 import ThresholdStep from "./protect-account-steps/threshold";
 import DelayPeriodStep from "./protect-account-steps/delay-period";
-import { NewAddress } from "@/types";
+import { NewAddress, SrmAddress } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useUpdateParameters } from "@/hooks/use-update-parameters";
 import LoadingModal from "./loading-modal";
 import { useSrmData } from "@/hooks/use-srm-data";
 import { useSocialRecoveryModule } from "@/hooks/use-social-recovery-module";
-import { SrmAddress } from "@/types";
+import { useModalSteps } from "@/hooks/use-modal-steps";
 import { SocialRecoveryModuleGracePeriodSelector } from "abstractionkit";
 
 export const delayPeriodMap: Record<SrmAddress, number> = {
@@ -27,8 +27,6 @@ export const delayPeriodValueMap: Record<number, string> = {
   [7]: "7-day",
   [14]: "14-day",
 };
-
-const totalSteps = 2;
 
 interface ParametersSectionProps {
   guardians: NewAddress[];
@@ -46,7 +44,6 @@ export default function ParametersSection({
   onDelayPeriodChange,
 }: ParametersSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
 
   const [tempThreshold, setTempThreshold] = useState(threshold);
   const [tempDelayPeriod, setTempDelayPeriod] = useState(delayPeriod);
@@ -73,7 +70,7 @@ export default function ParametersSection({
     });
 
     setIsOpen(false);
-    setCurrentStep(1);
+    reset();
     setError("");
   };
 
@@ -83,29 +80,36 @@ export default function ParametersSection({
     onSuccess,
   });
 
-  const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep((prev) => prev + 1);
-      return;
-    }
-    if (!parametersChanged) {
-      setError("Please, change at least one of the parameters to continue.");
-      return;
-    }
-    trigger();
-  };
+  const {
+    currentStep,
+    totalSteps,
+    handleNext: stepNext,
+    handleBack: stepBack,
+    reset,
+  } = useModalSteps({
+    totalSteps: 2,
+    onFinalStep: () => {
+      if (!parametersChanged) {
+        setError(
+          "Please, change at least one of the parameters to continue."
+        );
+        return;
+      }
+      trigger();
+    },
+  });
+
+  const handleNext = stepNext;
 
   const handleBack = () => {
     setError("");
-    if (currentStep > 1) {
-      setCurrentStep((prev) => prev - 1);
-    }
+    stepBack();
   };
 
   const handleModalClose = () => {
     setTempThreshold(threshold);
     setTempDelayPeriod(delayPeriod);
-    setCurrentStep(1);
+    reset();
     setIsOpen(false);
   };
 

@@ -7,13 +7,6 @@ export interface RecoveryQueryParams {
   chainId: string;
 }
 
-export type LinkParams = {
-  safeAddress?: string;
-  newOwners?: string;
-  newThreshold?: string;
-  chainId: string;
-};
-
 const isBrowser = typeof window !== "undefined";
 
 export const createFinalUrl = (params: RecoveryQueryParams): string => {

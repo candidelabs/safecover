@@ -46,8 +46,6 @@ export const useSearchStore = ({ chainId }: { chainId: number }) => {
     setIsLoading(true);
 
     try {
-      console.log("searching", searchValue);
-
       if (isValidLink(searchValue)) {
         window.location.href = searchValue;
         return;
