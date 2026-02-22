@@ -1,11 +1,11 @@
 import { useToast } from "@/hooks/use-toast";
 import { useLoadingContext } from "@/providers/loading";
 import { createFinalUrl, isValidLink } from "@/utils/recovery-link";
+import { getRpcUrl } from "@/utils/get-rpc-url";
 import { useState } from "react";
 import { usePublicClient } from "wagmi";
 import { Address, isAddress } from "viem";
 import { useSocialRecoveryModule } from "@/hooks/use-social-recovery-module";
-import { socialRecoveryModuleAbi } from "@/utils/abis/socialRecoveryModuleAbi";
 
 export const useSearchStore = ({ chainId }: { chainId: number }) => {
   const [searchValue, setSearchValue] = useState("");
@@ -23,12 +23,8 @@ export const useSearchStore = ({ chainId }: { chainId: number }) => {
     if (!chainId) throw new Error("Missing chainId");
     if (!srm) throw new Error("Missing srm");
 
-    const data = await publicClient.readContract({
-      address: srm.moduleAddress as Address,
-      abi: socialRecoveryModuleAbi,
-      functionName: "getRecoveryRequest",
-      args: [address],
-    });
+    const nodeRpcUrl = getRpcUrl(publicClient);
+    const data = await srm.getRecoveryRequest(nodeRpcUrl, address);
 
     if (data.newThreshold)
       return createFinalUrl({

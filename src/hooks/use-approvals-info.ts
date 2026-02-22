@@ -6,7 +6,7 @@ import { Address } from "viem";
 import { useQuery } from "@tanstack/react-query";
 import { getGuardianNickname, getStoredGuardians } from "@/utils/storage";
 import { useSrmData } from "./use-srm-data";
-import { socialRecoveryModuleAbi } from "@/utils/abis/socialRecoveryModuleAbi";
+import { getRpcUrl } from "@/utils/get-rpc-url";
 import { ApprovalsInfo } from "@/types";
 
 export function useApprovalsInfo({
@@ -41,19 +41,18 @@ export function useApprovalsInfo({
         throw new Error("A needed parameter is not available");
       }
 
-      const guardiansApprovalsListResults = await client.multicall({
-        contracts: guardians.map((guardian) => {
-          return {
-            address: srm.moduleAddress as Address,
-            abi: socialRecoveryModuleAbi,
-            functionName: "hasGuardianApproved",
-            args: [safeAddress, guardian, newOwners, BigInt(newThreshold)],
-          };
-        }),
-      });
+      const nodeRpcUrl = getRpcUrl(client);
 
-      const guardiansApprovalsList = guardiansApprovalsListResults.map(
-        (result) => result.status === "success" && result.result
+      const guardiansApprovalsList = await Promise.all(
+        guardians.map((guardian) =>
+          srm.hasGuardianApproved(
+            nodeRpcUrl,
+            safeAddress,
+            guardian,
+            newOwners,
+            newThreshold
+          )
+        )
       );
 
       const storedGuardians = getStoredGuardians(

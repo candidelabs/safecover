@@ -1,7 +1,7 @@
-import { Address, PublicClient, encodeFunctionData, zeroAddress } from "viem";
+import { Address, PublicClient } from "viem";
 import { SocialRecoveryModule } from "abstractionkit";
 import { getIsModuleEnabled } from "@/utils/getIsModuleEnabled";
-import { socialRecoveryModuleAbi } from "@/utils/abis/socialRecoveryModuleAbi";
+import { getRpcUrl } from "@/utils/get-rpc-url";
 import { BaseTx } from "@/types";
 
 function toBaseTxs(
@@ -52,22 +52,22 @@ export async function buildAddGuardiansTxs(
 
 export async function buildRevokeGuardiansTxs(
   srm: SocialRecoveryModule,
-  prevGuardian: Address,
+  publicClient: PublicClient,
+  accountAddress: Address,
   guardians: Address[],
   threshold: number
 ): Promise<BaseTx[]> {
+  const nodeRpcUrl = getRpcUrl(publicClient);
   const txs = [];
 
   for (const guardian of guardians) {
-    const revokeGuardianTx = {
-      to: srm.moduleAddress,
-      data: encodeFunctionData({
-        abi: socialRecoveryModuleAbi,
-        functionName: "revokeGuardianWithThreshold",
-        args: [prevGuardian, guardian, BigInt(threshold)],
-      }),
-      value: BigInt(0),
-    };
+    const revokeGuardianTx =
+      await srm.createRevokeGuardianWithThresholdMetaTransaction(
+        nodeRpcUrl,
+        accountAddress,
+        guardian,
+        BigInt(threshold)
+      );
     txs.push(revokeGuardianTx);
   }
 
@@ -82,18 +82,17 @@ export async function buildUpdateDelayPeriodTxs(
   guardians: Address[],
   threshold: number
 ): Promise<BaseTx[]> {
+  const nodeRpcUrl = getRpcUrl(publicClient);
   const removeGuardiansTxs = [];
+
   for (const [idx, guardian] of guardians.entries()) {
-    const prevGuardian = `${zeroAddress.slice(0, -1)}1` as Address;
-    const revokeGuardianTx = {
-      to: oldSrm.moduleAddress,
-      data: encodeFunctionData({
-        abi: socialRecoveryModuleAbi,
-        functionName: "revokeGuardianWithThreshold",
-        args: [prevGuardian, guardian, BigInt(guardians.length - idx - 1)],
-      }),
-      value: BigInt(0),
-    };
+    const revokeGuardianTx =
+      await oldSrm.createRevokeGuardianWithThresholdMetaTransaction(
+        nodeRpcUrl,
+        signer,
+        guardian,
+        BigInt(guardians.length - idx - 1)
+      );
     removeGuardiansTxs.push(revokeGuardianTx);
   }
 
