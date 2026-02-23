@@ -5,7 +5,6 @@ import SafeAddress from "@/components/ask-recovery-steps/safe-address";
 import NewOwners from "@/components/ask-recovery-steps/new-owners";
 import NewThreshold from "@/components/ask-recovery-steps/new-threshold";
 import ShareLink from "@/components/ask-recovery-steps/share-link";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { isAddress } from "viem";
 import { createFinalUrl } from "@/utils/recovery-link";
@@ -22,7 +21,6 @@ import { useToast } from "@/hooks/use-toast";
 const totalSteps = 4;
 
 export default function AskRecovery() {
-  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [safeAddress, setSafeAddress] = useState("");
   const [newOwners, setOwners] = useState<NewAddress[]>([]);
@@ -111,11 +109,7 @@ export default function AskRecovery() {
 
   const handleBack = () => {
     if (currentStep > 1) {
-      if (currentStep === 4) {
-        router.push(link);
-      } else {
-        setCurrentStep((prev) => prev - 1);
-      }
+      setCurrentStep((prev) => prev - 1);
     }
   };
 
@@ -261,7 +255,7 @@ export default function AskRecovery() {
         totalSteps={totalSteps}
         onNext={handleNext}
         onBack={handleBack}
-        backLabel={currentStep !== 4 ? "Back" : "Details"}
+        backLabel="Back"
         nextLabel={
           currentStep === 4
             ? "Copy Link"
