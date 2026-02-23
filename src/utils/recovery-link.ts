@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  compressToEncodedURIComponent,
+  decompressFromEncodedURIComponent,
+} from "lz-string";
+import { isAddress } from "viem";
+
 export interface RecoveryQueryParams {
   safeAddress: string;
   newOwners: string[];
@@ -17,50 +23,49 @@ export const createFinalUrl = (params: RecoveryQueryParams): string => {
     baseUrl = `${protocol}//${host}`;
   }
 
-  const hashParams = new URLSearchParams();
-  hashParams.append("safeAddress", params.safeAddress);
-  hashParams.append("newOwners", params.newOwners.join(","));
-  hashParams.append("newThreshold", params.newThreshold.toString());
-  hashParams.append("chainId", params.chainId);
+  const payload = {
+    s: params.safeAddress,
+    o: params.newOwners,
+    t: params.newThreshold,
+    c: params.chainId,
+  };
+  const compressed = compressToEncodedURIComponent(JSON.stringify(payload));
 
-  return `${baseUrl}/manage-recovery/dashboard#${hashParams.toString()}`;
+  return `${baseUrl}/manage-recovery/dashboard#${compressed}`;
 };
 
 export const isValidLink = (link: string): boolean => {
   try {
-    // Check if the link has a hash part
     const hashPart = link.split("#")[1];
     if (!hashPart) return false;
 
-    // Parse the hash parameters
-    const hashParams = new URLSearchParams(hashPart);
+    const decompressed = decompressFromEncodedURIComponent(hashPart);
+    if (!decompressed) return false;
 
-    // Required parameters
-    const safeAddress = hashParams.get("safeAddress");
-    const newOwnersStr = hashParams.get("newOwners");
-    const newThresholdStr = hashParams.get("newThreshold");
-    const chainId = hashParams.get("chainId");
+    const payload = JSON.parse(decompressed) as {
+      s?: string;
+      o?: string[];
+      t?: number | string;
+      c?: number | string;
+    };
 
-    // Check if all required parameters exist
-    if (!safeAddress || !newOwnersStr || !newThresholdStr || !chainId) {
+    if (!payload.s || !isAddress(payload.s)) return false;
+    if (!payload.o || !Array.isArray(payload.o) || payload.o.length === 0)
       return false;
-    }
+    if (!payload.o.every((owner) => isAddress(owner))) return false;
 
-    // Validate newOwners format
-    const newOwners = newOwnersStr.split(",");
-    if (newOwners.length === 0) {
-      return false;
-    }
+    const newThreshold = Number(payload.t);
+    const chainId = Number(payload.c);
 
-    // Validate newThreshold
-    const newThreshold = parseInt(newThresholdStr, 10);
     if (
-      isNaN(newThreshold) ||
+      !Number.isInteger(newThreshold) ||
       newThreshold <= 0 ||
-      newThreshold > newOwners.length
+      newThreshold > payload.o.length
     ) {
       return false;
     }
+
+    if (!Number.isInteger(chainId) || chainId <= 0) return false;
 
     return true;
   } catch (error) {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Address } from "viem";
+import { decompressFromEncodedURIComponent } from "lz-string";
 
 const isBrowser = typeof window !== "undefined";
 
@@ -12,6 +13,25 @@ type RecoveryParams = {
   chainId: number | undefined;
   recoveryLink: string | undefined;
 };
+
+function parseCompressedHash(hash: string): RecoveryParams {
+  const result = {} as RecoveryParams;
+
+  try {
+    const decompressed = decompressFromEncodedURIComponent(hash);
+    if (!decompressed) return result;
+
+    const payload = JSON.parse(decompressed);
+    if (payload.s) result.safeAddress = payload.s as Address;
+    if (payload.o) result.newOwners = payload.o as Address[];
+    if (payload.t) result.newThreshold = payload.t;
+    if (payload.c) result.chainId = Number(payload.c);
+  } catch {
+    return result;
+  }
+
+  return result;
+}
 
 function useHashParams(): RecoveryParams {
   const [params, setParams] = useState<RecoveryParams>({} as RecoveryParams);
@@ -27,22 +47,11 @@ function useHashParams(): RecoveryParams {
       return;
     }
 
-    const pairs = hash.split("&");
-    for (const pair of pairs) {
-      const [key, value] = pair.split("=");
-      if (key === "safeAddress" && value) {
-        result.safeAddress = value as Address;
-      }
-      if (key === "newOwners" && value) {
-        result.newOwners = value.split(",") as Address[];
-      }
-      if (key === "newThreshold" && value) {
-        result.newThreshold = Number(value);
-      }
-      if (key === "chainId" && value) {
-        result.chainId = Number(value);
-      }
-    }
+    const parsed = parseCompressedHash(hash);
+    result.safeAddress = parsed.safeAddress;
+    result.newOwners = parsed.newOwners;
+    result.newThreshold = parsed.newThreshold;
+    result.chainId = parsed.chainId;
 
     result.recoveryLink =
       result.safeAddress && result.newOwners && result.newThreshold

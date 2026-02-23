@@ -9,6 +9,7 @@ import ThresholdStep from "@/components/protect-account-steps/threshold";
 import { ConnectWalletButton } from "@/components/connect-wallet-button";
 import { useAccount } from "wagmi";
 import { useAddGuardians } from "@/hooks/use-add-guardians";
+import { useIsSafeAccount } from "@/hooks/use-is-safe-account";
 import { Address } from "viem";
 import { storeGuardians } from "@/utils/storage";
 import { useToast } from "@/hooks/use-toast";
@@ -19,6 +20,7 @@ import { BaseForm } from "@/components/base-form";
 import { useSrmData } from "@/hooks/use-srm-data";
 import { getEtherscanAddressLink } from "@/utils/get-etherscan-link";
 import { delayPeriodMap } from "@/utils/delay-period";
+import { WhatIsSafeModal } from "@/components/what-is-safe-modal";
 
 const totalSteps = 4;
 
@@ -27,6 +29,7 @@ const isBrowser = typeof window !== "undefined";
 export default function ProtectAccount() {
   const [currentStep, setCurrentStep] = useState(1);
   const [threshold, setThreshold] = useState(1);
+  const [showWhatIsSafeModal, setShowWhatIsSafeModal] = useState(false);
 
   const [guardians, setGuardians] = useState<NewAddress[]>([]);
 
@@ -36,6 +39,8 @@ export default function ProtectAccount() {
     isConnected: isWalletConnected,
     isConnecting: isWalletConnecting,
   } = useAccount();
+
+  const { isSafeAccount, isChecking } = useIsSafeAccount();
 
   const [delayPeriod, setDelayPeriod] = useState(3);
 
@@ -202,50 +207,65 @@ export default function ProtectAccount() {
   )
     router.push("/manage-recovery/dashboard");
 
-  if (isWalletConnecting) return <LoadingScreen />;
+  if (isWalletConnecting || (isWalletConnected && isChecking))
+    return <LoadingScreen />;
 
   return (
     <div className="flex flex-1 items-center justify-center mx-8">
       {isWalletConnected ? (
-        <>
-          <BaseForm
-            title={getStepTitle()}
-            description={getStepDescription()}
-            currentStep={currentStep}
-            totalSteps={totalSteps}
-            onNext={handleNext}
-            onBack={handleBack}
-            isNextDisabled={
-              (currentStep === 1 && guardians.length === 0) ||
-              (currentStep === 4 && isLoadingPostGuardians)
-            }
-            nextLabel={
-              currentStep === 3
-                ? "Finish and Review"
-                : currentStep === 4
-                ? isLoadingPostGuardians
-                  ? "Loading..."
-                  : "Setup Recovery"
-                : "Next"
-            }
-            isProgress
-          >
-            {getStepContent()}
-          </BaseForm>
-          <LoadingModal
-            loading={isLoadingPostGuardians}
-            loadingText={loadingMessage}
-            onCancel={cancel}
+        isSafeAccount ? (
+          <>
+            <BaseForm
+              title={getStepTitle()}
+              description={getStepDescription()}
+              currentStep={currentStep}
+              totalSteps={totalSteps}
+              onNext={handleNext}
+              onBack={handleBack}
+              isNextDisabled={
+                (currentStep === 1 && guardians.length === 0) ||
+                (currentStep === 4 && isLoadingPostGuardians)
+              }
+              nextLabel={
+                currentStep === 3
+                  ? "Finish and Review"
+                  : currentStep === 4
+                  ? isLoadingPostGuardians
+                    ? "Loading..."
+                    : "Setup Recovery"
+                  : "Next"
+              }
+              isProgress
+            >
+              {getStepContent()}
+            </BaseForm>
+            <LoadingModal
+              loading={isLoadingPostGuardians}
+              loadingText={loadingMessage}
+              onCancel={cancel}
+            />
+          </>
+        ) : (
+          <NotASafeAccount
+            onShowWhatIsSafe={() => setShowWhatIsSafeModal(true)}
           />
-        </>
+        )
       ) : (
-        <WalletNotConnected />
+        <WalletNotConnected onShowWhatIsSafe={() => setShowWhatIsSafeModal(true)} />
       )}
+      <WhatIsSafeModal
+        isOpen={showWhatIsSafeModal}
+        onClose={() => setShowWhatIsSafeModal(false)}
+      />
     </div>
   );
 }
 
-function WalletNotConnected() {
+function WalletNotConnected({
+  onShowWhatIsSafe,
+}: {
+  onShowWhatIsSafe: () => void;
+}) {
   return (
     <div className="max-w-2xl text-center">
       <h2 className="text-2xl text-primary font-bold font-roboto-mono text-center ">
@@ -257,6 +277,37 @@ function WalletNotConnected() {
         account.
       </p>
       <ConnectWalletButton />
+      <p className="mt-4">
+        <button
+          onClick={onShowWhatIsSafe}
+          className="text-sm text-primary underline hover:no-underline font-roboto-mono"
+        >
+          What is a Safe?
+        </button>
+      </p>
+    </div>
+  );
+}
+
+function NotASafeAccount({ onShowWhatIsSafe }: { onShowWhatIsSafe: () => void }) {
+  return (
+    <div className="max-w-2xl text-center">
+      <h2 className="text-2xl text-primary font-bold font-roboto-mono text-center ">
+        Wrong Wallet Type
+      </h2>
+      <p className="text-lg font-roboto-mono text-center text-foreground mb-6 mt-4">
+        This feature requires a Safe (smart contract wallet), but you likely connected
+        with a regular wallet (EOA). Please reconnect using your Safe account.
+      </p>
+      <ConnectWalletButton />
+      <p className="mt-4">
+        <button
+          onClick={onShowWhatIsSafe}
+          className="text-sm text-primary underline hover:no-underline font-roboto-mono"
+        >
+          What is a Safe?
+        </button>
+      </p>
     </div>
   );
 }

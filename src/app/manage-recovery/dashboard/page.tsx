@@ -23,6 +23,10 @@ import React, { useEffect, useState } from "react";
 import { Address } from "viem";
 import { useAccount, useSwitchChain } from "wagmi";
 import { sepolia } from "wagmi/chains";
+import { GuardianWelcome } from "@/components/guardian-welcome";
+import { getEtherscanAddressLink } from "@/utils/get-etherscan-link";
+
+const isBrowser = typeof window !== "undefined";
 
 const tabState = cn(
   "data-[state=active]:bg-secondary",
@@ -97,6 +101,15 @@ export default function Dashboard() {
     chainId,
   });
 
+  const { guardians } = useSrmData(safeAddress, chainId);
+
+  const isOwner = address && address.toLowerCase() === safeAddress?.toLowerCase();
+  const isGuardian = address && guardians?.some(
+    (g) => g.toLowerCase() === address.toLowerCase()
+  );
+
+  const showGuardianWelcome = recoveryLinkFromParams && !isOwner && !isGuardian && !address;
+
   const shouldRedirectToSettings = !recoveryLink && address;
   const shouldCallReconnect = !recoveryLink && !address && !isConnecting;
 
@@ -132,6 +145,33 @@ export default function Dashboard() {
       queryKey: ["threshold", safeAddress],
     });
   };
+
+  const handleExternalLink = (addr: string, chain: number) => {
+    if (isBrowser && chain) {
+      window.open(getEtherscanAddressLink(chain, addr));
+    }
+  };
+
+  const approvedGuardianAddresses = approvalsInfo?.guardiansApprovals
+    ?.filter((g) => g.status === "Approved")
+    .map((g) => g.address) ?? [];
+
+  const userHasApproved = address && approvedGuardianAddresses.some(
+    (a) => a.toLowerCase() === address.toLowerCase()
+  );
+
+  if (showGuardianWelcome && safeAddress && newOwners && newThreshold && chainId)
+    return (
+      <GuardianWelcome
+        safeAddress={safeAddress}
+        newOwners={newOwners}
+        newThreshold={newThreshold}
+        chainId={chainId}
+        approvalsInfo={approvalsInfo ? { approvals: approvedGuardianAddresses, needed: approvalsInfo.guardiansThreshold ?? newThreshold } : null}
+        onExternalLink={handleExternalLink}
+        userHasApproved={userHasApproved}
+      />
+    );
 
   if (shouldCallReconnect)
     return (
