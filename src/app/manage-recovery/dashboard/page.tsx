@@ -1,6 +1,7 @@
 "use client";
 
 import { ConnectWalletButton } from "@/components/connect-wallet-button";
+import { Button } from "@/components/ui/button";
 import GuardiansContent from "@/components/guardians-content";
 import LoadingGeneric from "@/components/loading-generic";
 import RecoveryContent from "@/components/recovery-content";
@@ -21,7 +22,7 @@ import { createFinalUrl } from "@/utils/recovery-link";
 import { useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { Address } from "viem";
-import { useAccount } from "wagmi";
+import { useAccount, useChains, useSwitchChain } from "wagmi";
 import { sepolia } from "wagmi/chains";
 import { GuardianWelcome } from "@/components/guardian-welcome";
 import { getEtherscanAddressLink } from "@/utils/get-etherscan-link";
@@ -80,8 +81,17 @@ export default function Dashboard() {
   const safeAddress = safeAddressFromParams ?? safeAddressFromWallet ?? address;
   const newOwners = newOwnersFromParams ?? newOwnersFromWallet;
   const newThreshold = newThresholdFromParams ?? newThresholdFromWallet;
-  // Match app network to wallet network when wallet is connected
-  const chainId = chainIdFromWallet ?? chainIdFromParams;
+  // A recovery link is for a specific chain, so it wins over the wallet's
+  const chainId = chainIdFromParams ?? chainIdFromWallet;
+
+  const chains = useChains();
+  const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
+  const isWrongChain = Boolean(
+    address && chainIdFromParams && chainIdFromWallet !== chainIdFromParams
+  );
+  const linkChainName =
+    chains.find((chain) => chain.id === chainIdFromParams)?.name ??
+    `chain ${chainIdFromParams}`;
 
   const { owners: safeSigners, safeThreshold } = useSrmData(
     safeAddress,
@@ -199,28 +209,49 @@ export default function Dashboard() {
               </TabsList>
 
               <TabsContent value="management">
-                <div className="grid grid-cols-3 gap-6">
-                  <RecoverySidebar
-                    recoveryLink={recoveryLink ?? ""}
-                    safeAddress={safeAddress}
-                    approvalsInfo={approvalsInfo}
-                    recoveryInfo={recoveryInfo}
-                    resetQueries={resetQueries}
-                  />
-                  <RecoveryContent
-                    safeSigners={safeSigners}
-                    safeThreshold={safeThreshold}
-                    safeAddress={safeAddress}
-                    newOwners={newOwners}
-                    newThreshold={newThreshold}
-                    delayPeriod={delayPeriodStr ?? ""}
-                    isLinkRequired={isLinkRequired}
-                    approvalsInfo={approvalsInfo}
-                    recoveryInfo={recoveryInfo}
-                    resetQueries={resetQueries}
-                    chainId={chainId ?? 1}
-                  />
-                </div>
+                {isWrongChain && (
+                  <div className="flex items-center justify-between gap-4 mb-4 p-4 rounded-xl border border-alert bg-content-background text-content-foreground font-roboto-mono text-sm">
+                    <p>
+                      This recovery is on {linkChainName}. Switch your wallet
+                      to {linkChainName} to take action.
+                    </p>
+                    <Button
+                      className="text-xs font-bold px-3 py-2 rounded-xl shrink-0"
+                      disabled={isSwitchingChain}
+                      onClick={() =>
+                        chainIdFromParams &&
+                        switchChain({ chainId: chainIdFromParams })
+                      }
+                    >
+                      Switch to {linkChainName}
+                    </Button>
+                  </div>
+                )}
+                {/* Disables every action while the wallet is on another chain */}
+                <fieldset disabled={isWrongChain} className="contents">
+                  <div className="grid grid-cols-3 gap-6">
+                    <RecoverySidebar
+                      recoveryLink={recoveryLink ?? ""}
+                      safeAddress={safeAddress}
+                      approvalsInfo={approvalsInfo}
+                      recoveryInfo={recoveryInfo}
+                      resetQueries={resetQueries}
+                    />
+                    <RecoveryContent
+                      safeSigners={safeSigners}
+                      safeThreshold={safeThreshold}
+                      safeAddress={safeAddress}
+                      newOwners={newOwners}
+                      newThreshold={newThreshold}
+                      delayPeriod={delayPeriodStr ?? ""}
+                      isLinkRequired={isLinkRequired}
+                      approvalsInfo={approvalsInfo}
+                      recoveryInfo={recoveryInfo}
+                      resetQueries={resetQueries}
+                      chainId={chainId ?? 1}
+                    />
+                  </div>
+                </fieldset>
               </TabsContent>
 
               <TabsContent value="settings">

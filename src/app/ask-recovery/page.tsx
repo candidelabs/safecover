@@ -5,7 +5,7 @@ import SafeAddress from "@/components/ask-recovery-steps/safe-address";
 import NewOwners from "@/components/ask-recovery-steps/new-owners";
 import NewThreshold from "@/components/ask-recovery-steps/new-threshold";
 import ShareLink from "@/components/ask-recovery-steps/share-link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { isAddress } from "viem";
 import { createFinalUrl } from "@/utils/recovery-link";
 
@@ -53,15 +53,21 @@ export default function AskRecovery() {
     Number(chainId)
   );
 
-  // Automatically set app chain to match wallet's connected chain
+  // Follow the wallet's chain when it changes during step 1. Only react to
+  // actual wallet changes, so returning to step 1 keeps a manual selection
+  // and later steps keep the chain the Safe was validated on.
+  const lastAccountChainId = useRef<number | undefined>(undefined);
   useEffect(() => {
+    if (accountChainId === lastAccountChainId.current) return;
+    lastAccountChainId.current = accountChainId;
     if (
+      currentStep === 1 &&
       accountChainId &&
       chains.map((chain) => chain.id).includes(accountChainId)
     ) {
       setChainId(accountChainId.toString());
     }
-  }, [accountChainId, chains]);
+  }, [accountChainId, chains, currentStep]);
 
   const isNextDisabled =
     (currentStep === 1 && !safeAddress) ||
