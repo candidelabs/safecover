@@ -1,0 +1,7 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "safecover",
+  "compatibility_date": "2026-10-01",
+  // Static export only: `next build` writes the site to ./out
+  "pages_build_output_dir": "./out"
+}
