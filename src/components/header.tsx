@@ -3,6 +3,7 @@ import React from "react";
 import SearchInput from "./search-input";
 import Link from "next/link";
 import { ConnectWalletButton } from "./connect-wallet-button";
+import { RpcSettingsButton } from "./rpc-settings-modal";
 
 const Header = () => {
   return (
@@ -15,8 +16,9 @@ const Header = () => {
         </Link>
       </div>
       <SearchInput />
-      <div className="flex flex-1 justify-center">
+      <div className="flex flex-1 justify-center items-center gap-2">
         <ConnectWalletButton />
+        <RpcSettingsButton />
       </div>
     </header>
   );

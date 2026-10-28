@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import { useAccount, usePublicClient } from "wagmi";
 import { sepolia } from "wagmi/chains";
 import { useQuery } from "@tanstack/react-query";
-import { getRpcUrl } from "@/utils/get-rpc-url";
+import { getRpcTransport } from "@/utils/get-rpc-transport";
 import { SrmAddress } from "@/types";
 
 const srmAddresses: SrmAddress[] = [
@@ -51,13 +51,13 @@ export function useSocialRecoveryModule(
       if (!addressToFetch) throw new Error("missing address to fetch");
       if (!chainIdToFetch) throw new Error("missing chainId");
 
-      const nodeRpcUrl = getRpcUrl(publicClient);
+      const rpcTransport = getRpcTransport(publicClient);
 
       const guardianCounts = await Promise.all(
         srmAddresses.map((addr) => {
           const srmInstance = new SocialRecoveryModule(addr);
           return srmInstance
-            .guardiansCount(nodeRpcUrl, addressToFetch)
+            .guardiansCount(rpcTransport, addressToFetch)
             .catch(() => BigInt(0));
         })
       );

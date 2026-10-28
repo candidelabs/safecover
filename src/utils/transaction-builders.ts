@@ -1,7 +1,7 @@
 import { Address, PublicClient } from "viem";
 import { SocialRecoveryModule } from "abstractionkit";
 import { getIsModuleEnabled } from "@/utils/getIsModuleEnabled";
-import { getRpcUrl } from "@/utils/get-rpc-url";
+import { getRpcTransport } from "@/utils/get-rpc-transport";
 import { BaseTx } from "@/types";
 
 function toBaseTxs(
@@ -57,13 +57,13 @@ export async function buildRevokeGuardiansTxs(
   guardians: Address[],
   threshold: number
 ): Promise<BaseTx[]> {
-  const nodeRpcUrl = getRpcUrl(publicClient);
+  const rpcTransport = getRpcTransport(publicClient);
   const txs = [];
 
   for (const guardian of guardians) {
     const revokeGuardianTx =
       await srm.createRevokeGuardianWithThresholdMetaTransaction(
-        nodeRpcUrl,
+        rpcTransport,
         accountAddress,
         guardian,
         BigInt(threshold)
@@ -82,13 +82,13 @@ export async function buildUpdateDelayPeriodTxs(
   guardians: Address[],
   threshold: number
 ): Promise<BaseTx[]> {
-  const nodeRpcUrl = getRpcUrl(publicClient);
+  const rpcTransport = getRpcTransport(publicClient);
   const removeGuardiansTxs = [];
 
   for (const [idx, guardian] of guardians.entries()) {
     const revokeGuardianTx =
       await oldSrm.createRevokeGuardianWithThresholdMetaTransaction(
-        nodeRpcUrl,
+        rpcTransport,
         signer,
         guardian,
         BigInt(guardians.length - idx - 1)

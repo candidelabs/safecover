@@ -6,7 +6,7 @@ import { Address } from "viem";
 import { useQuery } from "@tanstack/react-query";
 import { getGuardianNickname, getStoredGuardians } from "@/utils/storage";
 import { useSrmData } from "./use-srm-data";
-import { getRpcUrl } from "@/utils/get-rpc-url";
+import { getRpcTransport } from "@/utils/get-rpc-transport";
 import { ApprovalsInfo } from "@/types";
 
 export function useApprovalsInfo({
@@ -41,12 +41,12 @@ export function useApprovalsInfo({
         throw new Error("A needed parameter is not available");
       }
 
-      const nodeRpcUrl = getRpcUrl(client);
+      const rpcTransport = getRpcTransport(client);
 
       const guardiansApprovalsList = await Promise.all(
         guardians.map((guardian) =>
           srm.hasGuardianApproved(
-            nodeRpcUrl,
+            rpcTransport,
             safeAddress,
             guardian,
             newOwners,

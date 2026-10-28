@@ -5,7 +5,7 @@ import { useAccount, usePublicClient } from "wagmi";
 import { Address } from "viem";
 import { useQuery } from "@tanstack/react-query";
 import { safeWalletAbi } from "@/utils/abis/safeWalletAbi";
-import { getRpcUrl } from "@/utils/get-rpc-url";
+import { getRpcTransport } from "@/utils/get-rpc-transport";
 import { RecoveryInfo } from "@/types";
 
 export interface SrmData {
@@ -61,12 +61,12 @@ export function useSrmData(safeAddress?: Address, chainId?: number) {
         return output;
       }
 
-      const nodeRpcUrl = getRpcUrl(publicClient);
+      const rpcTransport = getRpcTransport(publicClient);
 
       const [guardians, threshold, recoveryRequest] = await Promise.all([
-        srm.getGuardians(nodeRpcUrl, addressToFetch),
-        srm.threshold(nodeRpcUrl, addressToFetch),
-        srm.getRecoveryRequest(nodeRpcUrl, addressToFetch),
+        srm.getGuardians(rpcTransport, addressToFetch),
+        srm.threshold(rpcTransport, addressToFetch),
+        srm.getRecoveryRequest(rpcTransport, addressToFetch),
       ]);
 
       output.guardians = guardians as Address[];
