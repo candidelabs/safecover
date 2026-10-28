@@ -1,7 +1,7 @@
 import { useToast } from "@/hooks/use-toast";
 import { useLoadingContext } from "@/providers/loading";
 import { createFinalUrl, isValidLink } from "@/utils/recovery-link";
-import { getRpcUrl } from "@/utils/get-rpc-url";
+import { getRpcTransport } from "@/utils/get-rpc-transport";
 import { useState } from "react";
 import { usePublicClient } from "wagmi";
 import { Address, isAddress } from "viem";
@@ -23,8 +23,8 @@ export const useSearchStore = ({ chainId }: { chainId: number }) => {
     if (!chainId) throw new Error("Missing chainId");
     if (!srm) throw new Error("Missing srm");
 
-    const nodeRpcUrl = getRpcUrl(publicClient);
-    const data = await srm.getRecoveryRequest(nodeRpcUrl, address);
+    const rpcTransport = getRpcTransport(publicClient);
+    const data = await srm.getRecoveryRequest(rpcTransport, address);
 
     if (data.newThreshold)
       return createFinalUrl({
